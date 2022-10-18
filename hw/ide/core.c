@@ -2138,6 +2138,7 @@ void ide_exec_cmd(IDEBus *bus, uint32_t val)
 
     if (!ide_cmd_permitted(s, val)) {
         ide_abort_command(s);
+        ide_cmd_done(s);
         ide_set_irq(s->bus);
         return;
     }
