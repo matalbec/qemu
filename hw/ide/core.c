@@ -1560,6 +1560,19 @@ static bool cmd_write_pio(IDEState *s, uint8_t cmd)
 static bool cmd_read_dma(IDEState *s, uint8_t cmd)
 {
     bool lba48 = (cmd == WIN_READDMA_EXT);
+    static int fail = FALSE;
+
+    if (fail) {
+        fail=FALSE;
+        trace_ide_fail_cmd();
+        ide_transfer_stop(s);
+        s->status = READY_STAT | ERR_STAT;
+        s->error = ICRC_ERR;
+        ide_set_irq(s->bus);
+        return true;
+    } else {
+        fail = TRUE;
+    }
 
     if (!s->blk) {
         ide_abort_command(s);
